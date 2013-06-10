@@ -56,15 +56,23 @@ sub printHelp
 
 sub printRoutes
 {
-	my @values = split(/\s/, $_[0]);
-	foreach my $val (@values)
-	{
-		if ($val =~ /^([\d]+)\.([\d]+)\.([\d]+)\.([\d]+)/)
-		{
-			my @newvalues = split(/\//, $val);
-			print "ip route " . $newvalues[0] . " " . computeMask($newvalues[1]) . " null0 name ". $_[1] . "\n";
-		}
-	}
+        if (!$_[0])
+        {
+                print "\nUnable to retrieve date from URL!\n";
+                print "Please check the ### VARIABLES ### section of this script.\n";
+        }
+        else
+        {
+        	my @values = split(/\s/, $_[0]);
+        	foreach my $val (@values)
+        	{
+        		if ($val =~ /^([\d]+)\.([\d]+)\.([\d]+)\.([\d]+)/)
+        		{
+        			my @newvalues = split(/\//, $val);
+        			print "ip route " . $newvalues[0] . " " . computeMask($newvalues[1]) . " null0 name ". $_[1] . "\n";
+        		}
+        	}
+        }
 }
 
 
