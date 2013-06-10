@@ -2,25 +2,30 @@
 
 ### Name:	 filtermaker.pl
 ### Author:	 Richard J. Hicks (richard.hicks@gmail.com)
-### Date:	 2010-06-25
+### Date:	 2010-06-25 (Modified: 2013-06-10)
 ### Description: This program downloads raw data from SPAMHAUS, CYMRU, OKEAN, 
 ###              and builds Cisco friendly null routes.
 
 
 use strict;
 use Switch;
+### use feature qw/switch/;
+use LWP;
 use LWP::Simple;
 use Getopt::Std;
 use POSIX qw(strftime);
+use Data::Dumper;
 
 my $currentDate = strftime "%Y-%m-%d", localtime;
 my $opt = 'abc';
 my %opt;
 getopts( $opt, \%opt );
-
+my $ua = LWP::UserAgent->new;
+my $agent = "my-lwp agent";
+$ua->agent($agent);
 
 ### VARIABLES ###
-my $spamhausURL  = "http://www.spamhaus.org/drop/drop.lasso";
+my $spamhausURL  = "http://www.spamhaus.org/drop/drop.txt";
 my $spamhausDesc = "SPAMHAUS-DROP-LIST_$currentDate";
 my $cymruURL     = "http://www.team-cymru.org/Services/Bogons/bogon-bn-nonagg.txt";
 my $cymruDesc    = "CYMRU-BOGON-LIST_$currentDate";
@@ -28,10 +33,21 @@ my $okeanURL     = "http://www.okean.com/chinacidr.txt";
 my $okeanDesc    = "OKEAN-CHINA-LIST_$currentDate";
 #################
 
-&printHelp unless ($opt{a} or $opt{b} or $opt{c});
-if ($opt{a}) { printRoutes(get($spamhausURL), $spamhausDesc); }
+# &printHelp unless ($opt{a} or $opt{b} or $opt{c});
+if ($opt{a})
+        {
+                my $req = HTTP::Request->new(GET => $spamhausURL);
+                $req->content_type('text/html');
+                $req->protocol('HTTP/1.0');
+                my $response = $ua->request($req);
+                printRoutes(Dumper($response), $spamhausDesc);
+        }
 if ($opt{b}) { printRoutes(get($cymruURL), $cymruDesc); }
 if ($opt{c}) { printRoutes(get($okeanURL), $okeanDesc); }
+
+
+
+
 
 
 
